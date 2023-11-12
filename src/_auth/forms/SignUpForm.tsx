@@ -1,6 +1,3 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -12,15 +9,26 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import Loader from "@/components/ui/shared/Loader";
-import { createNewUser } from "@/lib/appwrite/api";
+import { useUserContext } from "@/context/AuthContext";
+import {
+  useCreateUserAccount,
+  useSignInAccount,
+} from "@/lib/react-query/queriesAndMutations";
 import { SignUpValidation } from "@/lib/validation";
-import { Link } from "react-router-dom";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { z } from "zod";
 
 const SignUpForm = () => {
-  // * states start
-  const isLoading = false;
+  const navigate = useNavigate();
+  // * context start
+  const { checkAuthUser } = useUserContext();
+
+  const { mutateAsync: createUserAccount, isPending: isCreatingUser } =
+    useCreateUserAccount();
+  const { mutateAsync: signInAccount } = useSignInAccount();
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof SignUpValidation>>({
@@ -36,11 +44,42 @@ const SignUpForm = () => {
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof SignUpValidation>) {
     // create a new user
-    const newUser = await createNewUser(values);
+    const newUser = await createUserAccount(values);
     if (!newUser) {
       Swal.fire({
         title: "Oppps!!!",
-        text: "Something went wrong!",
+        text: "Sign Up Failed, Please Try Again!",
+        icon: "error",
+      });
+      return;
+    }
+
+    // session
+    const session = await signInAccount({
+      email: values.email,
+      password: values.password,
+    });
+    if (!session) {
+      Swal.fire({
+        title: "Oppps!!!",
+        text: "Sign In Failed, Please Try Again!",
+        icon: "error",
+      });
+      return;
+    }
+    const isLoggedIn = await checkAuthUser();
+    if (isLoggedIn) {
+      Swal.fire({
+        title: "Congratulations!",
+        text: "Signed Up Successfully!",
+        icon: "success",
+      });
+      form.reset();
+      navigate("/");
+    } else {
+      Swal.fire({
+        title: "Oppps!!!",
+        text: "Sign Up Failed, Please Try Again!",
         icon: "error",
       });
       return;
@@ -114,7 +153,7 @@ const SignUpForm = () => {
             )}
           />
           <Button type="submit" className="shad-button_primary">
-            {isLoading ? (
+            {isCreatingUser ? (
               <div className="flex-center gap-2">
                 {" "}
                 <Loader /> Loading...
