@@ -2,7 +2,7 @@ import { useUserContext } from "@/context/AuthContext";
 import { useSignOutAccount } from "@/lib/react-query/queriesAndMutations";
 import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Button } from "../button";
+import { Button } from "../ui/button";
 
 const Topbar = () => {
   const { mutate: signOut, isSuccess } = useSignOutAccount();
@@ -35,7 +35,7 @@ const Topbar = () => {
           </Button>
           <Link to={`/profile/${user.id}`}>
             <img
-              src={user.imageUrl || "/assest/images/profile-placeholder.svg"}
+              src={user.imageUrl || "/assets/icons/profile-placeholder.svg"}
               alt="profile"
               className="h-8 w-8 rounded-full"
             />

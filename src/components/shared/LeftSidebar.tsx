@@ -3,7 +3,7 @@ import { useUserContext } from "@/context/AuthContext";
 import { useSignOutAccount } from "@/lib/react-query/queriesAndMutations";
 import { INavLink } from "@/types";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { Button } from "../button";
+import { Button } from "../ui/button";
 
 const LeftSidebar = () => {
   const { user } = useUserContext();
@@ -22,7 +22,7 @@ const LeftSidebar = () => {
         </Link>
         <Link to={`/profile/${user.id}`} className="flex gap-3 items-center">
           <img
-            src={user.imageUrl || "/assest/images/profile-placeholder.svg"}
+            src={user.imageUrl || "/assets/icons/profile-placeholder.svg"}
             alt="profile"
             className="h-14 w-14 rounded-full"
           />
