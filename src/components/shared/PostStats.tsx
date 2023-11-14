@@ -22,18 +22,18 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
 
   // hooks
   const { mutate: likePost } = useLikePost();
-  const { mutate: savePost, isPending: isLoadingSave } = useSavePost();
-  const { mutate: deleteSavedPost, isPending: isLoadingDeleteSave } =
+  const { mutate: savePost, isPending: isSavingPost } = useSavePost();
+  const { mutate: deleteSavedPost, isPending: isDeletingSaved } =
     useDeleteSavedPost();
   const { data: currentUser } = useGetCurrentUser();
 
   const savedPostRecord = currentUser?.save.find(
-    (record: Models.Document) => record.post.$id === post.$id
+    (record: Models.Document) => record.post.$id === post?.$id
   );
 
   useEffect(() => {
     setIsSaved(!!savedPostRecord);
-  }, [currentUser]);
+  }, [savedPostRecord]);
 
   // handler
   const handleLikePost = (e: React.MouseEvent) => {
@@ -49,15 +49,16 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
     likePost({ postId: post.$id, likesArray: newLikes });
   };
   const handleSavePost = (e: React.MouseEvent) => {
-    e.stopPropagation();
+    /* e.stopPropagation();
 
     if (savedPostRecord) {
       setIsSaved(false);
       deleteSavedPost(savedPostRecord.$id);
-    } else {
-      savePost({ postId: post.$id, userId });
-      setIsSaved(true);
+      return;
     }
+
+    savePost({ postId: post.$id, userId });
+    setIsSaved(true); */
   };
   return (
     <div className="flex justify-between items-center z-20">
@@ -101,7 +102,7 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
         </div>
       </div>
       <div className="flex gap-2 mr-5">
-        {isLoadingSave || isLoadingDeleteSave ? (
+        {isSavingPost || isDeletingSaved ? (
           <Loader />
         ) : (
           <img
