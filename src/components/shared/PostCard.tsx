@@ -1,5 +1,5 @@
 import { useUserContext } from "@/context/AuthContext";
-import { formatDateString } from "@/lib/utils";
+import { multiFormatDateString } from "@/lib/utils";
 import { Models } from "appwrite";
 import { Link } from "react-router-dom";
 import { Badge } from "../ui/badge";
@@ -31,9 +31,9 @@ const PostCard = ({ post }: PostCardProps) => {
             <p className="base-medium lg:body-bold text-light-1">
               {post?.creator.name}
             </p>
-            <div className="flex-center gap-2 text-light-3">
+            <div className="flex items-center gap-2 text-light-3">
               <p className="tiny-bold lg:small-regular">
-                {formatDateString(post.$createdAt)}
+                {multiFormatDateString(post.$createdAt)}
               </p>{" "}
               - <p className="tiny-bold lg:small-regular">{post.location}</p>
             </div>

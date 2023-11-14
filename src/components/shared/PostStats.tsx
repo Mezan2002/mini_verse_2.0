@@ -10,12 +10,17 @@ import React, { useEffect, useState } from "react";
 import Loader from "./Loader";
 
 type PostStatsProps = {
-  post: Models.Document;
+  post?: Models.Document;
   userId: string;
+  showCommentAndShare?: boolean;
 };
 
-const PostStats = ({ post, userId }: PostStatsProps) => {
-  const likesList = post.likes.map((user: Models.Document) => user.$id);
+const PostStats = ({
+  post,
+  userId,
+  showCommentAndShare = true,
+}: PostStatsProps) => {
+  const likesList = post?.likes.map((user: Models.Document) => user.$id);
   // states
   const [likes, setLikes] = useState(likesList);
   const [isSaved, setIsSaved] = useState(false);
@@ -46,7 +51,7 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
       newLikes.push(userId);
     }
     setLikes(newLikes);
-    likePost({ postId: post.$id, likesArray: newLikes });
+    likePost({ postId: post?.$id || "", likesArray: newLikes });
   };
   const handleSavePost = (e: React.MouseEvent) => {
     /* e.stopPropagation();
@@ -61,7 +66,11 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
     setIsSaved(true); */
   };
   return (
-    <div className="flex justify-between items-center z-20">
+    <div
+      className={`flex justify-between items-center z-20 ${
+        showCommentAndShare === false && "mt-1"
+      }`}
+    >
       <div className="flex gap-4 md:gap-8">
         <div className="flex items-center">
           <img
@@ -78,30 +87,37 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
           />
           <p className="small-medium lg:base-medium ml-2">{likes.length}</p>
         </div>
-        <div className="flex items-center">
-          <img
-            src="/assets/icons/comment.png"
-            alt="like"
-            height={24}
-            width={24}
-            onClick={() => {}}
-            className="cursor-pointer"
-          />
-          <p className="small-medium lg:base-medium ml-2">0</p>
-        </div>
-        <div className="flex items-center">
-          <img
-            src="/assets/icons/share.svg"
-            alt="like"
-            height={24}
-            width={24}
-            onClick={() => {}}
-            className="cursor-pointer"
-          />
-          <p className="small-medium lg:base-medium ml-2">0</p>
-        </div>
+        {showCommentAndShare && (
+          <>
+            {" "}
+            <div className="flex items-center">
+              <img
+                src="/assets/icons/comment.png"
+                alt="like"
+                height={24}
+                width={24}
+                onClick={() => {}}
+                className="cursor-pointer"
+              />
+              <p className="small-medium lg:base-medium ml-2">0</p>
+            </div>
+            <div className="flex items-center">
+              <img
+                src="/assets/icons/share.svg"
+                alt="like"
+                height={24}
+                width={24}
+                onClick={() => {}}
+                className="cursor-pointer"
+              />
+              <p className="small-medium lg:base-medium ml-2">0</p>
+            </div>{" "}
+          </>
+        )}
       </div>
-      <div className="flex gap-2 mr-5">
+      <div
+        className={`flex gap-2 mr-2 ${showCommentAndShare === false && "ml-3"}`}
+      >
         {isSavingPost || isDeletingSaved ? (
           <Loader />
         ) : (

@@ -287,3 +287,36 @@ export async function deletePost(postId: string, imageId: string) {
     console.log(error);
   }
 }
+export async function getInfinityPosts({ pageParams }: { pageParams: number }) {
+  const queries: any[] = [Query.orderDesc("$updatedAt"), Query.limit(10)];
+
+  if (pageParams) {
+    queries.push(Query.cursorAfter(pageParams.toString()));
+  }
+
+  try {
+    const posts = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.postsCollectionId,
+      queries
+    );
+    if (!posts) throw Error;
+    return posts;
+  } catch (error) {
+    console.log(error);
+  }
+}
+export async function searchPosts(searchTerm: string) {
+  console.log(searchTerm);
+  try {
+    const posts = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.postsCollectionId,
+      [Query.search("caption", searchTerm)]
+    );
+    if (!posts) throw Error;
+    return posts;
+  } catch (error) {
+    console.log(error);
+  }
+}
